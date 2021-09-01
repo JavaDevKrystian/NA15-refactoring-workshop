@@ -43,6 +43,8 @@ private:
     bool checkCollisionOfNewHeadWithTail(const Segment& newHead);
     bool checkCollisions(const Segment& newHead);
 
+    bool checkCollisionOfRequestedFoodWithSnake(const FoodInd& requestedFood);
+
     void addNewHead(const Segment& newHead);
 
     void updateDirection(const Direction& direction);
