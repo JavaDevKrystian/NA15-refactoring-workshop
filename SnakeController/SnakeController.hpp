@@ -47,7 +47,8 @@ private:
 
     Segment createNewHead();
     void addNewHead(const Segment& newHead);
-
+    void removeUnnecessarySegments();
+    
     void updateDirection(const Direction& direction);
 
     IPort& m_displayPort;

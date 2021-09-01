@@ -69,18 +69,11 @@ void Controller::receive(std::unique_ptr<Event> e)
         auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
 
         Segment newHead = createNewHead();
-        
         bool lost = checkCollisions(newHead);
 
         if (not lost) {
             addNewHead(newHead);
-
-            m_segments.erase(
-                std::remove_if(
-                    m_segments.begin(),
-                    m_segments.end(),
-                    [](auto const& segment){ return not (segment.ttl > 0); }),
-                m_segments.end());
+            removeUnnecessarySegments();
         }
     } catch (std::bad_cast&) {
         try {
@@ -211,6 +204,16 @@ void Controller::addNewHead(const Segment& newHead)
     placeNewHead.value = Cell_SNAKE;
 
     m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewHead));
+}
+
+void Controller::removeUnnecessarySegments()
+{
+    m_segments.erase(
+        std::remove_if(
+            m_segments.begin(),
+            m_segments.end(),
+            [](auto const& segment){ return not (segment.ttl > 0); }),
+        m_segments.end());
 }
 
 void Controller::updateDirection(const Direction& direction)
