@@ -82,13 +82,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         }
 
         if (not lost) {
-            m_segments.push_front(newHead);
-            DisplayInd placeNewHead;
-            placeNewHead.x = newHead.x;
-            placeNewHead.y = newHead.y;
-            placeNewHead.value = Cell_SNAKE;
-
-            m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewHead));
+            addNewHead(newHead);
 
             m_segments.erase(
                 std::remove_if(
@@ -200,6 +194,17 @@ bool Controller::checkColisions(const Segment& newHead)
         }
     }
     return lost;
+}
+
+void Controller::addNewHead(const Segment& newHead)
+{
+    m_segments.push_front(newHead);
+    DisplayInd placeNewHead;
+    placeNewHead.x = newHead.x;
+    placeNewHead.y = newHead.y;
+    placeNewHead.value = Cell_SNAKE;
+
+    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewHead));
 }
 
 } // namespace Snake

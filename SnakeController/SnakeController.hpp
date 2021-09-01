@@ -43,6 +43,8 @@ private:
     bool checkColisionOfNewHeadWithTail(const Segment& newHead);
     bool checkColisions(const Segment& newHead);
 
+    void addNewHead(const Segment& newHead);
+
     IPort& m_displayPort;
     IPort& m_foodPort;
     IPort& m_scorePort;
