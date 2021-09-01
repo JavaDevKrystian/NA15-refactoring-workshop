@@ -45,6 +45,7 @@ private:
 
     bool checkCollisionOfRequestedFoodWithSnake(const FoodInd& requestedFood);
 
+    Segment createNewHead();
     void addNewHead(const Segment& newHead);
 
     void updateDirection(const Direction& direction);
