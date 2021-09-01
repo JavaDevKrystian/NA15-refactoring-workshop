@@ -75,15 +75,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         newHead.y = currentHead.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
         newHead.ttl = currentHead.ttl;
 
-        bool lost = false;
-
-        for (auto segment : m_segments) {
-            if (segment.x == newHead.x and segment.y == newHead.y) {
-                m_scorePort.send(std::make_unique<EventT<LooseInd>>());
-                lost = true;
-                break;
-            }
-        }
+        bool lost = checkColisionOfNewHeadWithTail(newHead);
 
         if (not lost) {
             if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
@@ -190,6 +182,17 @@ void Controller::receive(std::unique_ptr<Event> e)
             }
         }
     }
+}
+
+bool Controller::checkColisionOfNewHeadWithTail(const Segment& newHead)
+{
+    for (auto segment : m_segments) {
+        if (segment.x == newHead.x and segment.y == newHead.y) {
+            m_scorePort.send(std::make_unique<EventT<LooseInd>>());
+            return true;
+        }
+    }
+    return false;
 }
 
 } // namespace Snake

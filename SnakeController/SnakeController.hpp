@@ -40,6 +40,8 @@ private:
         int ttl;
     };
 
+    bool checkColisionOfNewHeadWithTail(const Segment& newHead);
+
     IPort& m_displayPort;
     IPort& m_foodPort;
     IPort& m_scorePort;
