@@ -75,7 +75,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         newHead.y = currentHead.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
         newHead.ttl = currentHead.ttl;
 
-        bool lost = checkColisions(newHead);
+        bool lost = checkCollisions(newHead);
 
         if (not lost) {
             addNewHead(newHead);
@@ -155,7 +155,7 @@ void Controller::receive(std::unique_ptr<Event> e)
     }
 }
 
-bool Controller::checkColisionOfNewHeadWithTail(const Segment& newHead)
+bool Controller::checkCollisionOfNewHeadWithTail(const Segment& newHead)
 {
     for (auto segment : m_segments) {
         if (segment.x == newHead.x and segment.y == newHead.y) {
@@ -166,9 +166,9 @@ bool Controller::checkColisionOfNewHeadWithTail(const Segment& newHead)
     return false;
 }
 
-bool Controller::checkColisions(const Segment& newHead)
+bool Controller::checkCollisions(const Segment& newHead)
 {
-    bool lost = checkColisionOfNewHeadWithTail(newHead);
+    bool lost = checkCollisionOfNewHeadWithTail(newHead);
     if(not lost) {
         if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
             m_scorePort.send(std::make_unique<EventT<ScoreInd>>());

@@ -40,8 +40,8 @@ private:
         int ttl;
     };
 
-    bool checkColisionOfNewHeadWithTail(const Segment& newHead);
-    bool checkColisions(const Segment& newHead);
+    bool checkCollisionOfNewHeadWithTail(const Segment& newHead);
+    bool checkCollisions(const Segment& newHead);
 
     void addNewHead(const Segment& newHead);
 
