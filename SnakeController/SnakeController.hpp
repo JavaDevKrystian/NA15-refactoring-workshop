@@ -48,8 +48,9 @@ private:
     Segment createNewHead();
     void addNewHead(const Segment& newHead);
     void removeUnnecessarySegments();
-    
+
     void updateDirection(const Direction& direction);
+    void updateFood(const FoodInd& receivedFood);
 
     IPort& m_displayPort;
     IPort& m_foodPort;
