@@ -50,6 +50,7 @@ private:
     void removeUnnecessarySegments();
 
     void updateDirection(const Direction& direction);
+    void updateReceivedFood(const FoodInd& receivedFood);
     void updateFood(const FoodInd& receivedFood);
 
     IPort& m_displayPort;

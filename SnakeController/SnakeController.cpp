@@ -82,15 +82,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         } catch (std::bad_cast&) {
             try {
                 auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
-
-                if (checkCollisionOfRequestedFoodWithSnake(receivedFood))
-                    m_foodPort.send(std::make_unique<EventT<FoodReq>>());
-                else
-                    updateFood(receivedFood);
-
-
-                m_foodPosition = std::make_pair(receivedFood.x, receivedFood.y);
-
+                updateReceivedFood(receivedFood);
             } catch (std::bad_cast&) {
                 try {
                     auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
@@ -209,6 +201,16 @@ void Controller::updateDirection(const Direction& direction)
     if ((m_currentDirection & 0b01) != (direction & 0b01)) {
         m_currentDirection = direction;
     }
+}
+
+void Controller::updateReceivedFood(const FoodInd& receivedFood)
+{
+    if (checkCollisionOfRequestedFoodWithSnake(receivedFood))
+        m_foodPort.send(std::make_unique<EventT<FoodReq>>());
+    else
+        updateFood(receivedFood);
+
+    m_foodPosition = std::make_pair(receivedFood.x, receivedFood.y);
 }
 
 void Controller::updateFood(const FoodInd& receivedFood)
