@@ -78,26 +78,7 @@ void Controller::receive(std::unique_ptr<Event> e)
         bool lost = checkColisionOfNewHeadWithTail(newHead);
 
         if (not lost) {
-            if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
-                m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
-                m_foodPort.send(std::make_unique<EventT<FoodReq>>());
-            } else if (newHead.x < 0 or newHead.y < 0 or
-                       newHead.x >= m_mapDimension.first or
-                       newHead.y >= m_mapDimension.second) {
-                m_scorePort.send(std::make_unique<EventT<LooseInd>>());
-                lost = true;
-            } else {
-                for (auto &segment : m_segments) {
-                    if (not --segment.ttl) {
-                        DisplayInd l_evt;
-                        l_evt.x = segment.x;
-                        l_evt.y = segment.y;
-                        l_evt.value = Cell_FREE;
-
-                        m_displayPort.send(std::make_unique<EventT<DisplayInd>>(l_evt));
-                    }
-                }
-            }
+            lost = checkColisions(newHead);
         }
 
         if (not lost) {
@@ -193,6 +174,32 @@ bool Controller::checkColisionOfNewHeadWithTail(const Segment& newHead)
         }
     }
     return false;
+}
+
+bool Controller::checkColisions(const Segment& newHead)
+{
+    bool lost = false;
+    if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
+        m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
+        m_foodPort.send(std::make_unique<EventT<FoodReq>>());
+    } else if (newHead.x < 0 or newHead.y < 0 or
+                newHead.x >= m_mapDimension.first or
+                newHead.y >= m_mapDimension.second) {
+        m_scorePort.send(std::make_unique<EventT<LooseInd>>());
+        lost = true;
+    } else {
+        for (auto &segment : m_segments) {
+            if (not --segment.ttl) {
+                DisplayInd l_evt;
+                l_evt.x = segment.x;
+                l_evt.y = segment.y;
+                l_evt.value = Cell_FREE;
+
+                m_displayPort.send(std::make_unique<EventT<DisplayInd>>(l_evt));
+            }
+        }
+    }
+    return lost;
 }
 
 } // namespace Snake
