@@ -45,6 +45,8 @@ private:
 
     void addNewHead(const Segment& newHead);
 
+    void updateDirection(const Direction& direction);
+
     IPort& m_displayPort;
     IPort& m_foodPort;
     IPort& m_scorePort;

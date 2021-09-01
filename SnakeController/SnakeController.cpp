@@ -90,10 +90,7 @@ void Controller::receive(std::unique_ptr<Event> e)
     } catch (std::bad_cast&) {
         try {
             auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
-
-            if ((m_currentDirection & 0b01) != (direction & 0b01)) {
-                m_currentDirection = direction;
-            }
+            updateDirection(direction);
         } catch (std::bad_cast&) {
             try {
                 auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
@@ -203,6 +200,13 @@ void Controller::addNewHead(const Segment& newHead)
     placeNewHead.value = Cell_SNAKE;
 
     m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewHead));
+}
+
+void Controller::updateDirection(const Direction& direction)
+{
+    if ((m_currentDirection & 0b01) != (direction & 0b01)) {
+        m_currentDirection = direction;
+    }
 }
 
 } // namespace Snake
