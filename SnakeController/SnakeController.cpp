@@ -81,7 +81,9 @@ bool Controller::checkCollisionOfCordWithSnake(const Coordinates& cord)
 
 bool Controller::checkCollisionOfNewHeadWithFood(const Segment& newHead)
 {
-    if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
+    Coordinates cordNewHead{ newHead.x, newHead.y };
+    Coordinates cordFood{ m_foodPosition.first, m_foodPosition.second };
+    if (cordNewHead == cordFood) {
         m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
         return true;
