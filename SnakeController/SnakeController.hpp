@@ -55,6 +55,7 @@ private:
 
     void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
     void tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e);
+    void tryHandleTheRequestedFoodEvent(std::unique_ptr<Event> e);
 
     IPort& m_displayPort;
     IPort& m_foodPort;

@@ -225,12 +225,17 @@ void Controller::tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e)
         auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
         updateReceivedFood(receivedFood);
     } catch (std::bad_cast&) {
-        try {
-            auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
-            updateRequestedFood(requestedFood);
-        } catch (std::bad_cast&) {
-            throw UnexpectedEventException();
-        }
+        tryHandleTheRequestedFoodEvent(std::move(e));
+    }
+}
+
+void Controller::tryHandleTheRequestedFoodEvent(std::unique_ptr<Event> e)
+{
+    try {
+        auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
+        updateRequestedFood(requestedFood);
+    } catch (std::bad_cast&) {
+        throw UnexpectedEventException();
     }
 }
 
