@@ -21,6 +21,16 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
       m_foodPort(p_foodPort),
       m_scorePort(p_scorePort)
 {
+    initializeConfiguration(p_config);
+}
+
+void Controller::receive(std::unique_ptr<Event> e)
+{
+    tryHandleTheTimerEvent(std::move(e));
+}
+
+void Controller::initializeConfiguration(std::string const& p_config)
+{
     std::istringstream istr(p_config);
     char w, f, s, d;
 
@@ -50,6 +60,7 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
             default:
                 throw ConfigurationError();
         }
+        
         istr >> length;
 
         while (length) {
@@ -62,11 +73,6 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
     } else {
         throw ConfigurationError();
     }
-}
-
-void Controller::receive(std::unique_ptr<Event> e)
-{
-    tryHandleTheTimerEvent(std::move(e));
 }
 
 void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)

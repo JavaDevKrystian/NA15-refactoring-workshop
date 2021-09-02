@@ -49,6 +49,8 @@ private:
         int ttl;
     };
 
+    void initializeConfiguration(std::string const& p_config);
+
     void tryHandleTheTimerEvent(std::unique_ptr<Event> e);
     void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
     void tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e);
