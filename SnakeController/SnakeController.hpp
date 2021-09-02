@@ -50,7 +50,7 @@ private:
         int ttl;
     };
 
-    bool checkCollisionOfCordWithSnake(const Segment& newHead);
+    bool checkCollisionOfCordWithSnake(const Coordinates& cord);
     bool checkCollisionOfNewHeadWithFood(const Segment& newHead);
     bool checkCollisionOfNewHeadWithWalls(const Segment& newHead);
     bool checkCollisions(const Segment& newHead);

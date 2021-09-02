@@ -68,10 +68,11 @@ void Controller::receive(std::unique_ptr<Event> e)
     tryHandleTheTimerEvent(std::move(e));
 }
 
-bool Controller::checkCollisionOfCordWithSnake(const Segment& newHead)
+bool Controller::checkCollisionOfCordWithSnake(const Coordinates& cord)
 {
     for (auto segment : m_segments) {
-        if (segment.x == newHead.x and segment.y == newHead.y) {
+        Coordinates cordSegment{ segment.x, segment.y };
+        if (cordSegment == cord) {
             return true;
         }
     }
@@ -100,7 +101,8 @@ bool Controller::checkCollisionOfNewHeadWithWalls(const Segment& newHead)
 
 bool Controller::checkCollisions(const Segment& newHead)
 {
-    bool lost = checkCollisionOfCordWithSnake(newHead);
+    Coordinates cordNewHead{ newHead.x, newHead.y };
+    bool lost = checkCollisionOfCordWithSnake(cordNewHead);
     if(not lost) { 
         if (not checkCollisionOfNewHeadWithFood(newHead)) {
             if (checkCollisionOfNewHeadWithWalls(newHead)) {
