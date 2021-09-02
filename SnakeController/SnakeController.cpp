@@ -67,14 +67,7 @@ void Controller::receive(std::unique_ptr<Event> e)
 {
     try {
         auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
-
-        Segment newHead = createNewHead();
-        bool lost = checkCollisions(newHead);
-
-        if (not lost) {
-            addNewHead(newHead);
-            removeUnnecessarySegments();
-        }
+        updateSnakeHead();
     } catch (std::bad_cast&) {
         tryHandleTheDirectionEvent(std::move(e));
     }
@@ -160,6 +153,16 @@ void Controller::removeUnnecessarySegments()
             m_segments.end(),
             [](auto const& segment){ return not (segment.ttl > 0); }),
         m_segments.end());
+}
+
+void Controller::updateSnakeHead()
+{
+    Segment newHead = createNewHead();
+
+    if (not checkCollisions(newHead)) {
+        addNewHead(newHead);
+        removeUnnecessarySegments();
+    }
 }
 
 void Controller::updateDirection(const Direction& direction)
