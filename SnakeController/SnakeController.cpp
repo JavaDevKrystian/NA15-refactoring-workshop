@@ -79,7 +79,7 @@ bool Controller::checkCollisionOfNewHeadWithTail(const Segment& newHead)
     return false;
 }
 
-bool Controller::checkCollsionOfNewHeadWithFood(const Segment& newHead)
+bool Controller::checkCollisionOfNewHeadWithFood(const Segment& newHead)
 {
     if (std::make_pair(newHead.x, newHead.y) == m_foodPosition) {
         m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
@@ -89,14 +89,22 @@ bool Controller::checkCollsionOfNewHeadWithFood(const Segment& newHead)
     return false;
 }
 
+bool Controller::checkCollisionOfNewHeadWithWalls(const Segment& newHead)
+{
+    if (newHead.x < 0 or newHead.y < 0 or
+        newHead.x >= m_mapDimension.first or
+        newHead.y >= m_mapDimension.second) {
+            return true;
+    }
+    return false;    
+}
+
 bool Controller::checkCollisions(const Segment& newHead)
 {
     bool lost = checkCollisionOfNewHeadWithTail(newHead);
     if(not lost) {
-        if (not checkCollsionOfNewHeadWithFood(newHead)) {
-            if (newHead.x < 0 or newHead.y < 0 or
-                        newHead.x >= m_mapDimension.first or
-                        newHead.y >= m_mapDimension.second) {
+        if (not checkCollisionOfNewHeadWithFood(newHead)) {
+            if (checkCollisionOfNewHeadWithWalls(newHead)) {
                 m_scorePort.send(std::make_unique<EventT<LooseInd>>());
                 lost = true;
             } else {

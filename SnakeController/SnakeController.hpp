@@ -41,7 +41,8 @@ private:
     };
 
     bool checkCollisionOfNewHeadWithTail(const Segment& newHead);
-    bool checkCollsionOfNewHeadWithFood(const Segment& newHead);
+    bool checkCollisionOfNewHeadWithFood(const Segment& newHead);
+    bool checkCollisionOfNewHeadWithWalls(const Segment& newHead);
     bool checkCollisions(const Segment& newHead);
     bool checkCollisionOfFoodWithSnake(int x, int y);
 
