@@ -127,16 +127,20 @@ Controller::Segment Controller::createNewHead()
     return newHead;
 }
 
+void Controller::sendDisplayIndEvent(const Coordinates& cord, const Cell& value)
+{
+    DisplayInd event;
+    event.x = cord.x;
+    event.y = cord.y;
+    event.value = value;
+    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(event));
+}
+
 void Controller::clearCellsWithSegmentsWithLostTTL()
 {
     for (auto &segment : m_segments) {
         if (not --segment.ttl) {
-            DisplayInd l_evt;
-            l_evt.x = segment.x;
-            l_evt.y = segment.y;
-            l_evt.value = Cell_FREE;
-
-            m_displayPort.send(std::make_unique<EventT<DisplayInd>>(l_evt));
+            sendDisplayIndEvent(Coordinates{segment.x, segment.y}, Cell::Cell_FREE);
         }
     }
 }
@@ -144,12 +148,7 @@ void Controller::clearCellsWithSegmentsWithLostTTL()
 void Controller::addNewHead(const Segment& newHead)
 {
     m_segments.push_front(newHead);
-    DisplayInd placeNewHead;
-    placeNewHead.x = newHead.x;
-    placeNewHead.y = newHead.y;
-    placeNewHead.value = Cell_SNAKE;
-
-    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewHead));
+    sendDisplayIndEvent(Coordinates{newHead.x, newHead.y}, Cell::Cell_SNAKE);
 }
 
 void Controller::removeUnnecessarySegments()
@@ -199,29 +198,15 @@ void Controller::updateRequestedFood(const FoodResp& requestedFood)
     if (checkCollisionOfCordWithSnake(cordRequestedFood)) {
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
     } else {
-        DisplayInd placeNewFood;
-        placeNewFood.x = requestedFood.x;
-        placeNewFood.y = requestedFood.y;
-        placeNewFood.value = Cell_FOOD;
-        m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewFood));
+        sendDisplayIndEvent(cordRequestedFood, Cell::Cell_FOOD);
     }
-
     m_foodPosition = cordRequestedFood;
 }
 
 void Controller::updateFood(const FoodInd& receivedFood)
 {
-    DisplayInd clearOldFood;
-    clearOldFood.x = m_foodPosition.x;
-    clearOldFood.y = m_foodPosition.y;
-    clearOldFood.value = Cell_FREE;
-    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(clearOldFood));
-
-    DisplayInd placeNewFood;
-    placeNewFood.x = receivedFood.x;
-    placeNewFood.y = receivedFood.y;
-    placeNewFood.value = Cell_FOOD;
-    m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewFood));
+    sendDisplayIndEvent(m_foodPosition, Cell::Cell_FREE);
+    sendDisplayIndEvent(Coordinates{receivedFood.x, receivedFood.y}, Cell::Cell_FOOD);
 }
 
 void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)

@@ -56,6 +56,7 @@ private:
     bool checkCollisions(const Coordinates& cordNewHead);
 
     Segment createNewHead();
+    void sendDisplayIndEvent(const Coordinates& cord, const Cell& value);
     void clearCellsWithSegmentsWithLostTTL();
     void addNewHead(const Segment& newHead);
     void removeUnnecessarySegments();
