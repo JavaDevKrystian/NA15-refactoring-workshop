@@ -50,6 +50,7 @@ private:
     };
 
     void initializeConfiguration(std::string const& p_config);
+    void setCurrentDirection(char d);
 
     void tryHandleTheTimerEvent(std::unique_ptr<Event> e);
     void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);

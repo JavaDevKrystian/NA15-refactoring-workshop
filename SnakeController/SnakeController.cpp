@@ -44,22 +44,7 @@ void Controller::initializeConfiguration(std::string const& p_config)
         m_foodPosition.y = foodY;
 
         istr >> d;
-        switch (d) {
-            case 'U':
-                m_currentDirection = Direction_UP;
-                break;
-            case 'D':
-                m_currentDirection = Direction_DOWN;
-                break;
-            case 'L':
-                m_currentDirection = Direction_LEFT;
-                break;
-            case 'R':
-                m_currentDirection = Direction_RIGHT;
-                break;
-            default:
-                throw ConfigurationError();
-        }
+        setCurrentDirection(d);
         
         istr >> length;
 
@@ -72,6 +57,26 @@ void Controller::initializeConfiguration(std::string const& p_config)
         }
     } else {
         throw ConfigurationError();
+    }
+}
+
+void Controller::setCurrentDirection(char d)
+{
+    switch (d) {
+        case 'U':
+            m_currentDirection = Direction_UP;
+            break;
+        case 'D':
+            m_currentDirection = Direction_DOWN;
+            break;
+        case 'L':
+            m_currentDirection = Direction_LEFT;
+            break;
+        case 'R':
+            m_currentDirection = Direction_RIGHT;
+            break;
+        default:
+            throw ConfigurationError();
     }
 }
 
