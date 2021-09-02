@@ -102,22 +102,13 @@ bool Controller::checkCollisionOfNewHeadWithWalls(const Segment& newHead)
 bool Controller::checkCollisions(const Segment& newHead)
 {
     bool lost = checkCollisionOfNewHeadWithTail(newHead);
-    if(not lost) {
+    if(not lost) { 
         if (not checkCollisionOfNewHeadWithFood(newHead)) {
             if (checkCollisionOfNewHeadWithWalls(newHead)) {
                 m_scorePort.send(std::make_unique<EventT<LooseInd>>());
                 lost = true;
             } else {
-                for (auto &segment : m_segments) {
-                    if (not --segment.ttl) {
-                        DisplayInd l_evt;
-                        l_evt.x = segment.x;
-                        l_evt.y = segment.y;
-                        l_evt.value = Cell_FREE;
-
-                        m_displayPort.send(std::make_unique<EventT<DisplayInd>>(l_evt));
-                    }
-                }
+                clearCellsWithSegmentsWithLostTTL();
             }
         }
     }
@@ -144,6 +135,20 @@ Controller::Segment Controller::createNewHead()
     newHead.ttl = currentHead.ttl;
 
     return newHead;
+}
+
+void Controller::clearCellsWithSegmentsWithLostTTL()
+{
+    for (auto &segment : m_segments) {
+        if (not --segment.ttl) {
+            DisplayInd l_evt;
+            l_evt.x = segment.x;
+            l_evt.y = segment.y;
+            l_evt.value = Cell_FREE;
+
+            m_displayPort.send(std::make_unique<EventT<DisplayInd>>(l_evt));
+        }
+    }
 }
 
 void Controller::addNewHead(const Segment& newHead)

@@ -47,6 +47,7 @@ private:
     bool checkCollisionOfFoodWithSnake(int x, int y);
 
     Segment createNewHead();
+    void clearCellsWithSegmentsWithLostTTL();
     void addNewHead(const Segment& newHead);
     void removeUnnecessarySegments();
 
