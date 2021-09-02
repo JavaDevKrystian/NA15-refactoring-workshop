@@ -54,6 +54,7 @@ private:
     void updateFood(const FoodInd& receivedFood);
 
     void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
+    void tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e);
 
     IPort& m_displayPort;
     IPort& m_foodPort;
