@@ -33,6 +33,16 @@ public:
     void receive(std::unique_ptr<Event> e) override;
 
 private:
+    struct Coordinates
+    {
+        int x;
+        int y;
+
+        bool operator==(const Coordinates& cord)
+        {
+            return (x == cord.x && y == cord.y);
+        }
+    };
     struct Segment
     {
         int x;
