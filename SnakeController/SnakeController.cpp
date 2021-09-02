@@ -182,11 +182,11 @@ void Controller::updateDirection(const Direction& direction)
 void Controller::updateReceivedFood(const FoodInd& receivedFood)
 {
     Coordinates cordReceivedFood{ receivedFood.x, receivedFood.y };
-    if (checkCollisionOfCordWithSnake(cordReceivedFood))
+    if (checkCollisionOfCordWithSnake(cordReceivedFood)) {
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
-    else
-        updateFood(receivedFood);
-
+    } else {
+        updateFood(cordReceivedFood);
+    }
     m_foodPosition = cordReceivedFood;
 }
 
@@ -201,10 +201,10 @@ void Controller::updateRequestedFood(const FoodResp& requestedFood)
     m_foodPosition = cordRequestedFood;
 }
 
-void Controller::updateFood(const FoodInd& receivedFood)
+void Controller::updateFood(const Coordinates& cordReceivedFood)
 {
     sendDisplayIndEvent(m_foodPosition, Cell::Cell_FREE);
-    sendDisplayIndEvent(Coordinates{receivedFood.x, receivedFood.y}, Cell::Cell_FOOD);
+    sendDisplayIndEvent(cordReceivedFood, Cell::Cell_FOOD);
 }
 
 void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)

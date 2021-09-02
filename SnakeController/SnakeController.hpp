@@ -64,7 +64,7 @@ private:
     void updateDirection(const Direction& direction);
     void updateReceivedFood(const FoodInd& receivedFood);
     void updateRequestedFood(const FoodResp& requestedFood);
-    void updateFood(const FoodInd& receivedFood);
+    void updateFood(const Coordinates& cordReceivedFood);
 
     void tryHandleTheTimerEvent(std::unique_ptr<Event> e);
     void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
