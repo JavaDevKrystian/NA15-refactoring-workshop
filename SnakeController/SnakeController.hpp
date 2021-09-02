@@ -51,6 +51,7 @@ private:
 
     void updateDirection(const Direction& direction);
     void updateReceivedFood(const FoodInd& receivedFood);
+    void updateRequestedFood(const FoodResp& requestedFood);
     void updateFood(const FoodInd& receivedFood);
 
     IPort& m_displayPort;
