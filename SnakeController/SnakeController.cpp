@@ -54,7 +54,7 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
 
         while (length) {
             Segment seg;
-            istr >> seg.x >> seg.y;
+            istr >> seg.cord.x >> seg.cord.y;
             seg.ttl = length--;
 
             m_segments.push_back(seg);
@@ -72,8 +72,7 @@ void Controller::receive(std::unique_ptr<Event> e)
 bool Controller::checkCollisionOfCordWithSnake(const Coordinates& cord)
 {
     for (auto segment : m_segments) {
-        Coordinates cordSegment{ segment.x, segment.y };
-        if (cordSegment == cord) {
+        if (segment.cord == cord) {
             return true;
         }
     }
@@ -120,8 +119,8 @@ Controller::Segment Controller::createNewHead()
     Segment const& currentHead = m_segments.front();
 
     Segment newHead;
-    newHead.x = currentHead.x + ((m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
-    newHead.y = currentHead.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
+    newHead.cord.x = currentHead.cord.x + ((m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
+    newHead.cord.y = currentHead.cord.y + (not (m_currentDirection & 0b01) ? (m_currentDirection & 0b10) ? 1 : -1 : 0);
     newHead.ttl = currentHead.ttl;
 
     return newHead;
@@ -140,7 +139,7 @@ void Controller::clearCellsWithSegmentsWithLostTTL()
 {
     for (auto &segment : m_segments) {
         if (not --segment.ttl) {
-            sendDisplayIndEvent(Coordinates{segment.x, segment.y}, Cell::Cell_FREE);
+            sendDisplayIndEvent(segment.cord, Cell::Cell_FREE);
         }
     }
 }
@@ -148,7 +147,7 @@ void Controller::clearCellsWithSegmentsWithLostTTL()
 void Controller::addNewHead(const Segment& newHead)
 {
     m_segments.push_front(newHead);
-    sendDisplayIndEvent(Coordinates{newHead.x, newHead.y}, Cell::Cell_SNAKE);
+    sendDisplayIndEvent(newHead.cord, Cell::Cell_SNAKE);
 }
 
 void Controller::removeUnnecessarySegments()
@@ -165,8 +164,7 @@ void Controller::updateSnake()
 {
     Segment newHead = createNewHead();
 
-    Coordinates cordNewHead{ newHead.x, newHead.y };
-    if (not checkCollisions(cordNewHead)) {
+    if (not checkCollisions(newHead.cord)) {
         addNewHead(newHead);
         removeUnnecessarySegments();
     } else {

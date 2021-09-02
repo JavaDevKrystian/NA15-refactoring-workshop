@@ -45,8 +45,7 @@ private:
     };
     struct Segment
     {
-        int x;
-        int y;
+        Coordinates cord;
         int ttl;
     };
 
