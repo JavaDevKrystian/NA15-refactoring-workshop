@@ -51,7 +51,7 @@ private:
     void addNewHead(const Segment& newHead);
     void removeUnnecessarySegments();
 
-    void updateSnakeHead();
+    void updateSnake();
     void updateDirection(const Direction& direction);
     void updateReceivedFood(const FoodInd& receivedFood);
     void updateRequestedFood(const FoodResp& requestedFood);

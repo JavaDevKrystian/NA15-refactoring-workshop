@@ -72,7 +72,6 @@ bool Controller::checkCollisionOfNewHeadWithTail(const Segment& newHead)
 {
     for (auto segment : m_segments) {
         if (segment.x == newHead.x and segment.y == newHead.y) {
-            m_scorePort.send(std::make_unique<EventT<LooseInd>>());
             return true;
         }
     }
@@ -105,7 +104,6 @@ bool Controller::checkCollisions(const Segment& newHead)
     if(not lost) { 
         if (not checkCollisionOfNewHeadWithFood(newHead)) {
             if (checkCollisionOfNewHeadWithWalls(newHead)) {
-                m_scorePort.send(std::make_unique<EventT<LooseInd>>());
                 lost = true;
             } else {
                 clearCellsWithSegmentsWithLostTTL();
@@ -172,13 +170,15 @@ void Controller::removeUnnecessarySegments()
         m_segments.end());
 }
 
-void Controller::updateSnakeHead()
+void Controller::updateSnake()
 {
     Segment newHead = createNewHead();
 
     if (not checkCollisions(newHead)) {
         addNewHead(newHead);
         removeUnnecessarySegments();
+    } else {
+        m_scorePort.send(std::make_unique<EventT<LooseInd>>());
     }
 }
 
@@ -233,7 +233,7 @@ void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)
 {
     try {
         auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
-        updateSnakeHead();
+        updateSnake();
     } catch (std::bad_cast&) {
         tryHandleTheDirectionEvent(std::move(e));
     }
