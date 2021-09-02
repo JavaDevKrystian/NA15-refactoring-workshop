@@ -38,7 +38,7 @@ void Controller::initializeConfiguration(std::string const& p_config)
     istr >> w >> width >> height >> f >> foodX >> foodY >> s >> d;
 
     if (w == 'W' and f == 'F' and s == 'S') {
-        m_mapDimension = std::make_pair(width, height);
+        initializeMapDimension(width, height);
         m_foodPosition.x = foodX;
         m_foodPosition.y = foodY;
 
@@ -79,6 +79,11 @@ void Controller::createSegments(std::istringstream istr)
         seg.ttl = length--;
         m_segments.push_back(seg);
     }
+}
+
+void Controller::initializeMapDimension(int width, int height)
+{
+    m_mapDimension = std::make_pair(width, height);
 }
 
 void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)
