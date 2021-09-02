@@ -81,7 +81,8 @@ void Controller::createSegments(std::istringstream istr)
 
 void Controller::initializeMapDimension(int width, int height)
 {
-    m_mapDimension = std::make_pair(width, height);
+    m_mapDimension.x = width;
+    m_mapDimension.y = height;
 }
 
 void Controller::initializeFoodPosition(int x, int y)
@@ -214,8 +215,8 @@ bool Controller::checkCollisionOfNewHeadWithFood(const Coordinates& cordNewHead)
 bool Controller::checkCollisionOfNewHeadWithWalls(const Coordinates& cordNewHead)
 {
     if (cordNewHead.x < 0 or cordNewHead.y < 0 or
-        cordNewHead.x >= m_mapDimension.first or
-        cordNewHead.y >= m_mapDimension.second) {
+        cordNewHead.x >= m_mapDimension.x or
+        cordNewHead.y >= m_mapDimension.y) {
             return true;
     }
     return false;    

@@ -81,7 +81,7 @@ private:
     IPort& m_foodPort;
     IPort& m_scorePort;
 
-    std::pair<int, int> m_mapDimension;
+    Coordinates m_mapDimension;
     Coordinates m_foodPosition;
 
     Direction m_currentDirection;
