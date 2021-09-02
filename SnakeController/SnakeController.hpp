@@ -49,16 +49,10 @@ private:
         int ttl;
     };
 
-    bool checkCollisionOfCordWithSnake(const Coordinates& cord);
-    bool checkCollisionOfNewHeadWithFood(const Coordinates& cordNewHead);
-    bool checkCollisionOfNewHeadWithWalls(const Coordinates& cordNewHead);
-    bool checkCollisions(const Coordinates& cordNewHead);
-
-    Segment createNewHead();
-    void sendDisplayIndEvent(const Coordinates& cord, const Cell& value);
-    void clearCellsWithSegmentsWithLostTTL();
-    void addNewHead(const Segment& newHead);
-    void removeUnnecessarySegments();
+    void tryHandleTheTimerEvent(std::unique_ptr<Event> e);
+    void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
+    void tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e);
+    void tryHandleTheRequestedFoodEvent(std::unique_ptr<Event> e);
 
     void updateSnake();
     void updateDirection(const Direction& direction);
@@ -66,10 +60,16 @@ private:
     void updateRequestedFood(const FoodResp& requestedFood);
     void updateFood(const Coordinates& cordReceivedFood);
 
-    void tryHandleTheTimerEvent(std::unique_ptr<Event> e);
-    void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
-    void tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e);
-    void tryHandleTheRequestedFoodEvent(std::unique_ptr<Event> e);
+    bool checkCollisions(const Coordinates& cordNewHead);
+    bool checkCollisionOfCordWithSnake(const Coordinates& cord);
+    bool checkCollisionOfNewHeadWithFood(const Coordinates& cordNewHead);
+    bool checkCollisionOfNewHeadWithWalls(const Coordinates& cordNewHead);
+
+    Segment createNewHead();
+    void sendDisplayIndEvent(const Coordinates& cord, const Cell& value);
+    void clearCellsWithSegmentsWithLostTTL();
+    void addNewHead(const Segment& newHead);
+    void removeUnnecessarySegments();
 
     IPort& m_displayPort;
     IPort& m_foodPort;

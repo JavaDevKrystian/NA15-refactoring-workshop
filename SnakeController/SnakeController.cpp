@@ -69,6 +69,107 @@ void Controller::receive(std::unique_ptr<Event> e)
     tryHandleTheTimerEvent(std::move(e));
 }
 
+void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)
+{
+    try {
+        auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
+        updateSnake();
+    } catch (std::bad_cast&) {
+        tryHandleTheDirectionEvent(std::move(e));
+    }
+}
+
+void Controller::tryHandleTheDirectionEvent(std::unique_ptr<Event> e)
+{
+    try {
+        auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
+        updateDirection(direction);
+    } catch (std::bad_cast&) {
+        tryHandleTheReceivedFoodEvent(std::move(e));
+    }
+}
+
+void Controller::tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e)
+{
+    try {
+        auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
+        updateReceivedFood(receivedFood);
+    } catch (std::bad_cast&) {
+        tryHandleTheRequestedFoodEvent(std::move(e));
+    }
+}
+
+void Controller::tryHandleTheRequestedFoodEvent(std::unique_ptr<Event> e)
+{
+    try {
+        auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
+        updateRequestedFood(requestedFood);
+    } catch (std::bad_cast&) {
+        throw UnexpectedEventException();
+    }
+}
+
+void Controller::updateSnake()
+{
+    Segment newHead = createNewHead();
+    if (not checkCollisions(newHead.cord)) {
+        addNewHead(newHead);
+        removeUnnecessarySegments();
+    } else {
+        m_scorePort.send(std::make_unique<EventT<LooseInd>>());
+    }
+}
+
+void Controller::updateDirection(const Direction& direction)
+{
+    if ((m_currentDirection & 0b01) != (direction & 0b01)) {
+        m_currentDirection = direction;
+    }
+}
+
+void Controller::updateReceivedFood(const FoodInd& receivedFood)
+{
+    Coordinates cordReceivedFood{ receivedFood.x, receivedFood.y };
+    if (checkCollisionOfCordWithSnake(cordReceivedFood)) {
+        m_foodPort.send(std::make_unique<EventT<FoodReq>>());
+    } else {
+        updateFood(cordReceivedFood);
+    }
+    m_foodPosition = cordReceivedFood;
+}
+
+void Controller::updateRequestedFood(const FoodResp& requestedFood)
+{
+    Coordinates cordRequestedFood{ requestedFood.x, requestedFood.y };
+    if (checkCollisionOfCordWithSnake(cordRequestedFood)) {
+        m_foodPort.send(std::make_unique<EventT<FoodReq>>());
+    } else {
+        sendDisplayIndEvent(cordRequestedFood, Cell::Cell_FOOD);
+    }
+    m_foodPosition = cordRequestedFood;
+}
+
+void Controller::updateFood(const Coordinates& cordReceivedFood)
+{
+    sendDisplayIndEvent(m_foodPosition, Cell::Cell_FREE);
+    sendDisplayIndEvent(cordReceivedFood, Cell::Cell_FOOD);
+}
+
+bool Controller::checkCollisions(const Coordinates& cordNewHead)
+{
+    bool lost = checkCollisionOfCordWithSnake(cordNewHead);
+    if(not lost) { 
+        if (not checkCollisionOfNewHeadWithFood(cordNewHead)) {
+            if (checkCollisionOfNewHeadWithWalls(cordNewHead)) {
+                lost = true;
+            } else {
+                clearCellsWithSegmentsWithLostTTL();
+            }
+        }
+    }
+    return lost;
+}
+
 bool Controller::checkCollisionOfCordWithSnake(const Coordinates& cord)
 {
     for (auto segment : m_segments) {
@@ -97,21 +198,6 @@ bool Controller::checkCollisionOfNewHeadWithWalls(const Coordinates& cordNewHead
             return true;
     }
     return false;    
-}
-
-bool Controller::checkCollisions(const Coordinates& cordNewHead)
-{
-    bool lost = checkCollisionOfCordWithSnake(cordNewHead);
-    if(not lost) { 
-        if (not checkCollisionOfNewHeadWithFood(cordNewHead)) {
-            if (checkCollisionOfNewHeadWithWalls(cordNewHead)) {
-                lost = true;
-            } else {
-                clearCellsWithSegmentsWithLostTTL();
-            }
-        }
-    }
-    return lost;
 }
 
 Controller::Segment Controller::createNewHead()
@@ -158,93 +244,6 @@ void Controller::removeUnnecessarySegments()
             m_segments.end(),
             [](auto const& segment){ return not (segment.ttl > 0); }),
         m_segments.end());
-}
-
-void Controller::updateSnake()
-{
-    Segment newHead = createNewHead();
-
-    if (not checkCollisions(newHead.cord)) {
-        addNewHead(newHead);
-        removeUnnecessarySegments();
-    } else {
-        m_scorePort.send(std::make_unique<EventT<LooseInd>>());
-    }
-}
-
-void Controller::updateDirection(const Direction& direction)
-{
-    if ((m_currentDirection & 0b01) != (direction & 0b01)) {
-        m_currentDirection = direction;
-    }
-}
-
-void Controller::updateReceivedFood(const FoodInd& receivedFood)
-{
-    Coordinates cordReceivedFood{ receivedFood.x, receivedFood.y };
-    if (checkCollisionOfCordWithSnake(cordReceivedFood)) {
-        m_foodPort.send(std::make_unique<EventT<FoodReq>>());
-    } else {
-        updateFood(cordReceivedFood);
-    }
-    m_foodPosition = cordReceivedFood;
-}
-
-void Controller::updateRequestedFood(const FoodResp& requestedFood)
-{
-    Coordinates cordRequestedFood{ requestedFood.x, requestedFood.y };
-    if (checkCollisionOfCordWithSnake(cordRequestedFood)) {
-        m_foodPort.send(std::make_unique<EventT<FoodReq>>());
-    } else {
-        sendDisplayIndEvent(cordRequestedFood, Cell::Cell_FOOD);
-    }
-    m_foodPosition = cordRequestedFood;
-}
-
-void Controller::updateFood(const Coordinates& cordReceivedFood)
-{
-    sendDisplayIndEvent(m_foodPosition, Cell::Cell_FREE);
-    sendDisplayIndEvent(cordReceivedFood, Cell::Cell_FOOD);
-}
-
-void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)
-{
-    try {
-        auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
-        updateSnake();
-    } catch (std::bad_cast&) {
-        tryHandleTheDirectionEvent(std::move(e));
-    }
-}
-
-void Controller::tryHandleTheDirectionEvent(std::unique_ptr<Event> e)
-{
-    try {
-        auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
-        updateDirection(direction);
-    } catch (std::bad_cast&) {
-        tryHandleTheReceivedFoodEvent(std::move(e));
-    }
-}
-
-void Controller::tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e)
-{
-    try {
-        auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
-        updateReceivedFood(receivedFood);
-    } catch (std::bad_cast&) {
-        tryHandleTheRequestedFoodEvent(std::move(e));
-    }
-}
-
-void Controller::tryHandleTheRequestedFoodEvent(std::unique_ptr<Event> e)
-{
-    try {
-        auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
-        updateRequestedFood(requestedFood);
-    } catch (std::bad_cast&) {
-        throw UnexpectedEventException();
-    }
 }
 
 } // namespace Snake
