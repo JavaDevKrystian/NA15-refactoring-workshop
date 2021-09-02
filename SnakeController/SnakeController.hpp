@@ -76,7 +76,7 @@ private:
     IPort& m_scorePort;
 
     std::pair<int, int> m_mapDimension;
-    std::pair<int, int> m_foodPosition;
+    Coordinates m_foodPosition;
 
     Direction m_currentDirection;
     std::list<Segment> m_segments;

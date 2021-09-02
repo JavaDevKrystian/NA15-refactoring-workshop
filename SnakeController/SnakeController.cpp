@@ -30,7 +30,8 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
 
     if (w == 'W' and f == 'F' and s == 'S') {
         m_mapDimension = std::make_pair(width, height);
-        m_foodPosition = std::make_pair(foodX, foodY);
+        m_foodPosition.x = foodX;
+        m_foodPosition.y = foodY;
 
         istr >> d;
         switch (d) {
@@ -81,8 +82,7 @@ bool Controller::checkCollisionOfCordWithSnake(const Coordinates& cord)
 
 bool Controller::checkCollisionOfNewHeadWithFood(const Coordinates& cordNewHead)
 {
-    Coordinates cordFood{ m_foodPosition.first, m_foodPosition.second };
-    if (cordFood == cordNewHead) {
+    if (m_foodPosition == cordNewHead) {
         m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
         return true;
@@ -190,7 +190,7 @@ void Controller::updateReceivedFood(const FoodInd& receivedFood)
     else
         updateFood(receivedFood);
 
-    m_foodPosition = std::make_pair(receivedFood.x, receivedFood.y);
+    m_foodPosition = cordReceivedFood;
 }
 
 void Controller::updateRequestedFood(const FoodResp& requestedFood)
@@ -206,14 +206,14 @@ void Controller::updateRequestedFood(const FoodResp& requestedFood)
         m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewFood));
     }
 
-    m_foodPosition = std::make_pair(requestedFood.x, requestedFood.y);
+    m_foodPosition = cordRequestedFood;
 }
 
 void Controller::updateFood(const FoodInd& receivedFood)
 {
     DisplayInd clearOldFood;
-    clearOldFood.x = m_foodPosition.first;
-    clearOldFood.y = m_foodPosition.second;
+    clearOldFood.x = m_foodPosition.x;
+    clearOldFood.y = m_foodPosition.y;
     clearOldFood.value = Cell_FREE;
     m_displayPort.send(std::make_unique<EventT<DisplayInd>>(clearOldFood));
 
