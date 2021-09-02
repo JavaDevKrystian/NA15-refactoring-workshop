@@ -87,13 +87,7 @@ void Controller::receive(std::unique_ptr<Event> e)
                 try {
                     auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
 
-                    bool requestedFoodCollidedWithSnake = false;
-                    for (auto const& segment : m_segments) {
-                        if (segment.x == requestedFood.x and segment.y == requestedFood.y) {
-                            requestedFoodCollidedWithSnake = true;
-                            break;
-                        }
-                    }
+                    bool requestedFoodCollidedWithSnake = checkCollisionOfFoodWithSnake(requestedFood.x, requestedFood.y);
 
                     if (requestedFoodCollidedWithSnake) {
                         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
@@ -153,10 +147,10 @@ bool Controller::checkCollisions(const Segment& newHead)
     return lost;
 }
 
-bool Controller::checkCollisionOfRequestedFoodWithSnake(const FoodInd& requestedFood)
+bool Controller::checkCollisionOfFoodWithSnake(int x, int y)
 {
     for (auto const& segment : m_segments) {
-        if (segment.x == requestedFood.x and segment.y == requestedFood.y) {
+        if (segment.x == x and segment.y == y) {
             return true;
         }
     }
@@ -205,7 +199,7 @@ void Controller::updateDirection(const Direction& direction)
 
 void Controller::updateReceivedFood(const FoodInd& receivedFood)
 {
-    if (checkCollisionOfRequestedFoodWithSnake(receivedFood))
+    if (checkCollisionOfFoodWithSnake(receivedFood.x, receivedFood.y))
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
     else
         updateFood(receivedFood);
