@@ -65,12 +65,7 @@ Controller::Controller(IPort& p_displayPort, IPort& p_foodPort, IPort& p_scorePo
 
 void Controller::receive(std::unique_ptr<Event> e)
 {
-    try {
-        auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
-        updateSnakeHead();
-    } catch (std::bad_cast&) {
-        tryHandleTheDirectionEvent(std::move(e));
-    }
+    tryHandleTheTimerEvent(std::move(e));
 }
 
 bool Controller::checkCollisionOfNewHeadWithTail(const Segment& newHead)
@@ -210,6 +205,16 @@ void Controller::updateFood(const FoodInd& receivedFood)
     placeNewFood.y = receivedFood.y;
     placeNewFood.value = Cell_FOOD;
     m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewFood));
+}
+
+void Controller::tryHandleTheTimerEvent(std::unique_ptr<Event> e)
+{
+    try {
+        auto const& timerEvent = *dynamic_cast<EventT<TimeoutInd> const&>(*e);
+        updateSnakeHead();
+    } catch (std::bad_cast&) {
+        tryHandleTheDirectionEvent(std::move(e));
+    }
 }
 
 void Controller::tryHandleTheDirectionEvent(std::unique_ptr<Event> e)

@@ -54,6 +54,7 @@ private:
     void updateRequestedFood(const FoodResp& requestedFood);
     void updateFood(const FoodInd& receivedFood);
 
+    void tryHandleTheTimerEvent(std::unique_ptr<Event> e);
     void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
     void tryHandleTheReceivedFoodEvent(std::unique_ptr<Event> e);
     void tryHandleTheRequestedFoodEvent(std::unique_ptr<Event> e);
