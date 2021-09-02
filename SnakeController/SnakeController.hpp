@@ -51,6 +51,7 @@ private:
 
     void initializeConfiguration(std::string const& p_config);
     void initializeMapDimension(int width, int height);
+    void initializeFoodPosition(int x, int y);
     void setCurrentDirection(char d);
     void createSegments(std::istringstream istr);
 
