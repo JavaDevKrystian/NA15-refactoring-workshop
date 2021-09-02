@@ -51,9 +51,9 @@ private:
     };
 
     bool checkCollisionOfCordWithSnake(const Coordinates& cord);
-    bool checkCollisionOfNewHeadWithFood(const Segment& newHead);
-    bool checkCollisionOfNewHeadWithWalls(const Segment& newHead);
-    bool checkCollisions(const Segment& newHead);
+    bool checkCollisionOfNewHeadWithFood(const Coordinates& cordNewHead);
+    bool checkCollisionOfNewHeadWithWalls(const Coordinates& cordNewHead);
+    bool checkCollisions(const Coordinates& cordNewHead);
 
     Segment createNewHead();
     void clearCellsWithSegmentsWithLostTTL();

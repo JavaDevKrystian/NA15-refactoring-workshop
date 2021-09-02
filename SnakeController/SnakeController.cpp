@@ -79,11 +79,10 @@ bool Controller::checkCollisionOfCordWithSnake(const Coordinates& cord)
     return false;
 }
 
-bool Controller::checkCollisionOfNewHeadWithFood(const Segment& newHead)
+bool Controller::checkCollisionOfNewHeadWithFood(const Coordinates& cordNewHead)
 {
-    Coordinates cordNewHead{ newHead.x, newHead.y };
     Coordinates cordFood{ m_foodPosition.first, m_foodPosition.second };
-    if (cordNewHead == cordFood) {
+    if (cordFood == cordNewHead) {
         m_scorePort.send(std::make_unique<EventT<ScoreInd>>());
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
         return true;
@@ -91,23 +90,22 @@ bool Controller::checkCollisionOfNewHeadWithFood(const Segment& newHead)
     return false;
 }
 
-bool Controller::checkCollisionOfNewHeadWithWalls(const Segment& newHead)
+bool Controller::checkCollisionOfNewHeadWithWalls(const Coordinates& cordNewHead)
 {
-    if (newHead.x < 0 or newHead.y < 0 or
-        newHead.x >= m_mapDimension.first or
-        newHead.y >= m_mapDimension.second) {
+    if (cordNewHead.x < 0 or cordNewHead.y < 0 or
+        cordNewHead.x >= m_mapDimension.first or
+        cordNewHead.y >= m_mapDimension.second) {
             return true;
     }
     return false;    
 }
 
-bool Controller::checkCollisions(const Segment& newHead)
+bool Controller::checkCollisions(const Coordinates& cordNewHead)
 {
-    Coordinates cordNewHead{ newHead.x, newHead.y };
     bool lost = checkCollisionOfCordWithSnake(cordNewHead);
     if(not lost) { 
-        if (not checkCollisionOfNewHeadWithFood(newHead)) {
-            if (checkCollisionOfNewHeadWithWalls(newHead)) {
+        if (not checkCollisionOfNewHeadWithFood(cordNewHead)) {
+            if (checkCollisionOfNewHeadWithWalls(cordNewHead)) {
                 lost = true;
             } else {
                 clearCellsWithSegmentsWithLostTTL();
@@ -168,7 +166,8 @@ void Controller::updateSnake()
 {
     Segment newHead = createNewHead();
 
-    if (not checkCollisions(newHead)) {
+    Coordinates cordNewHead{ newHead.x, newHead.y };
+    if (not checkCollisions(cordNewHead)) {
         addNewHead(newHead);
         removeUnnecessarySegments();
     } else {
