@@ -33,28 +33,17 @@ void Controller::initializeConfiguration(std::string const& p_config)
 {
     std::istringstream istr(p_config);
     char w, f, s, d;
-
-    int width, height, length;
+    int width, height;
     int foodX, foodY;
-    istr >> w >> width >> height >> f >> foodX >> foodY >> s;
+    istr >> w >> width >> height >> f >> foodX >> foodY >> s >> d;
 
     if (w == 'W' and f == 'F' and s == 'S') {
         m_mapDimension = std::make_pair(width, height);
         m_foodPosition.x = foodX;
         m_foodPosition.y = foodY;
 
-        istr >> d;
         setCurrentDirection(d);
-        
-        istr >> length;
-
-        while (length) {
-            Segment seg;
-            istr >> seg.cord.x >> seg.cord.y;
-            seg.ttl = length--;
-
-            m_segments.push_back(seg);
-        }
+        createSegments(std::move(istr));
     } else {
         throw ConfigurationError();
     }
@@ -77,6 +66,18 @@ void Controller::setCurrentDirection(char d)
             break;
         default:
             throw ConfigurationError();
+    }
+}
+
+void Controller::createSegments(std::istringstream istr)
+{
+    int length;
+    istr >> length;
+    while (length) {
+        Segment seg;
+        istr >> seg.cord.x >> seg.cord.y;
+        seg.ttl = length--;
+        m_segments.push_back(seg);
     }
 }
 
