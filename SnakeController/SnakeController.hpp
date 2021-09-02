@@ -42,7 +42,6 @@ private:
 
     bool checkCollisionOfNewHeadWithTail(const Segment& newHead);
     bool checkCollisions(const Segment& newHead);
-
     bool checkCollisionOfFoodWithSnake(int x, int y);
 
     Segment createNewHead();
@@ -53,6 +52,8 @@ private:
     void updateReceivedFood(const FoodInd& receivedFood);
     void updateRequestedFood(const FoodResp& requestedFood);
     void updateFood(const FoodInd& receivedFood);
+
+    void tryHandleTheDirectionEvent(std::unique_ptr<Event> e);
 
     IPort& m_displayPort;
     IPort& m_foodPort;

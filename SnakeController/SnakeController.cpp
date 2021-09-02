@@ -76,22 +76,7 @@ void Controller::receive(std::unique_ptr<Event> e)
             removeUnnecessarySegments();
         }
     } catch (std::bad_cast&) {
-        try {
-            auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
-            updateDirection(direction);
-        } catch (std::bad_cast&) {
-            try {
-                auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
-                updateReceivedFood(receivedFood);
-            } catch (std::bad_cast&) {
-                try {
-                    auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
-                    updateRequestedFood(requestedFood);
-                } catch (std::bad_cast&) {
-                    throw UnexpectedEventException();
-                }
-            }
-        }
+        tryHandleTheDirectionEvent(std::move(e));
     }
 }
 
@@ -222,6 +207,26 @@ void Controller::updateFood(const FoodInd& receivedFood)
     placeNewFood.y = receivedFood.y;
     placeNewFood.value = Cell_FOOD;
     m_displayPort.send(std::make_unique<EventT<DisplayInd>>(placeNewFood));
+}
+
+void Controller::tryHandleTheDirectionEvent(std::unique_ptr<Event> e)
+{
+    try {
+        auto direction = dynamic_cast<EventT<DirectionInd> const&>(*e)->direction;
+        updateDirection(direction);
+    } catch (std::bad_cast&) {
+        try {
+            auto receivedFood = *dynamic_cast<EventT<FoodInd> const&>(*e);
+            updateReceivedFood(receivedFood);
+        } catch (std::bad_cast&) {
+            try {
+                auto requestedFood = *dynamic_cast<EventT<FoodResp> const&>(*e);
+                updateRequestedFood(requestedFood);
+            } catch (std::bad_cast&) {
+                throw UnexpectedEventException();
+            }
+        }
+    }
 }
 
 } // namespace Snake
