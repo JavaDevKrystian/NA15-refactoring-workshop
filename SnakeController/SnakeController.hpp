@@ -54,7 +54,6 @@ private:
     bool checkCollisionOfNewHeadWithFood(const Segment& newHead);
     bool checkCollisionOfNewHeadWithWalls(const Segment& newHead);
     bool checkCollisions(const Segment& newHead);
-    bool checkCollisionOfFoodWithSnake(int x, int y);
 
     Segment createNewHead();
     void clearCellsWithSegmentsWithLostTTL();

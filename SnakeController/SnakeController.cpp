@@ -115,16 +115,6 @@ bool Controller::checkCollisions(const Segment& newHead)
     return lost;
 }
 
-bool Controller::checkCollisionOfFoodWithSnake(int x, int y)
-{
-    for (auto const& segment : m_segments) {
-        if (segment.x == x and segment.y == y) {
-            return true;
-        }
-    }
-    return false;
-}
-
 Controller::Segment Controller::createNewHead()
 {
     Segment const& currentHead = m_segments.front();
@@ -193,7 +183,8 @@ void Controller::updateDirection(const Direction& direction)
 
 void Controller::updateReceivedFood(const FoodInd& receivedFood)
 {
-    if (checkCollisionOfFoodWithSnake(receivedFood.x, receivedFood.y))
+    Coordinates cordReceivedFood{ receivedFood.x, receivedFood.y };
+    if (checkCollisionOfCordWithSnake(cordReceivedFood))
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
     else
         updateFood(receivedFood);
@@ -203,7 +194,8 @@ void Controller::updateReceivedFood(const FoodInd& receivedFood)
 
 void Controller::updateRequestedFood(const FoodResp& requestedFood)
 {
-    if (checkCollisionOfFoodWithSnake(requestedFood.x, requestedFood.y)) {
+    Coordinates cordRequestedFood{ requestedFood.x, requestedFood.y };
+    if (checkCollisionOfCordWithSnake(cordRequestedFood)) {
         m_foodPort.send(std::make_unique<EventT<FoodReq>>());
     } else {
         DisplayInd placeNewFood;
